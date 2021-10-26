@@ -11,7 +11,20 @@ type Instruction uint8
 
 const (
 	InstructionCreateMetadataAccount Instruction = iota
+	InstructionUpdateMetadataAccount
+	InstructionDeprecatedCreateMasterEdition
+	InstructionDeprecatedMintNewEditionFromMasterEditionViaPrintingToken
 	InstructionUpdatePrimarySaleHappenedViaToken
+	InstructionDeprecatedSetReservationList
+	InstructionDeprecatedCreateReservationList
+	InstructionSignMetadata
+	InstructionDeprecatedMintPrintingTokensViaToken
+	InstructionDeprecatedMintPrintingTokens
+	InstructionCreateMasterEdition
+	InstructionMintNewEditionFromMasterEditionViaToken
+	InstructionConvertMasterEditionV1ToV2
+	InstructionMintNewEditionFromMasterEditionViaVaultProxy
+	InstructionPuffMetadata
 )
 
 func CreateMetadataAccount(metadata, mint, mintAuthority, payer, updateAuthority common.PublicKey, updateAuthorityIsSigner, isMutable bool, mintData Data) (types.Instruction, error) {
