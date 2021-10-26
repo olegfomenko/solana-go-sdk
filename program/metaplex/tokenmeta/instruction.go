@@ -72,7 +72,7 @@ func CreateMetadataAccount(metadata, mint, mintAuthority, payer, updateAuthority
 	}, nil
 }
 
-func UpdatePrimarySaleHappenedViaToken(token, owner common.PublicKey) (types.Instruction, error) {
+func UpdatePrimarySaleHappenedViaToken(token, owner, account common.PublicKey) (types.Instruction, error) {
 	data, err := borsh.Serialize(struct {
 		Instruction Instruction
 	}{
@@ -94,6 +94,11 @@ func UpdatePrimarySaleHappenedViaToken(token, owner common.PublicKey) (types.Ins
 			{
 				PubKey:     owner,
 				IsSigner:   true,
+				IsWritable: false,
+			},
+			{
+				PubKey:     account,
+				IsSigner:   false,
 				IsWritable: false,
 			},
 		},
