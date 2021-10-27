@@ -119,14 +119,17 @@ func UpdatePrimarySaleHappenedViaToken(metadata, owner, account common.PublicKey
 	}, nil
 }
 
-func UpdateMetadataAccount(metadata, owner common.PublicKey) (types.Instruction, error) {
+func UpdateMetadataAccount(metadata, owner common.PublicKey, updateData *Data, updateAuthority *common.PublicKey, updatePrimarySaleHappened *bool) (types.Instruction, error) {
 	data, err := borsh.Serialize(struct {
 		Instruction         Instruction
 		Data                *Data
 		UpdateAuthority     *common.PublicKey
 		PrimarySaleHappened *bool
 	}{
-		Instruction: InstructionUpdateMetadataAccount,
+		Instruction:         InstructionUpdateMetadataAccount,
+		Data:                updateData,
+		UpdateAuthority:     updateAuthority,
+		PrimarySaleHappened: updatePrimarySaleHappened,
 	})
 
 	if err != nil {
