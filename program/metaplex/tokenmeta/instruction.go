@@ -118,3 +118,35 @@ func UpdatePrimarySaleHappenedViaToken(metadata, owner, account common.PublicKey
 		Data: data,
 	}, nil
 }
+
+func UpdateMetadataAccount(metadata, owner common.PublicKey) (types.Instruction, error) {
+	data, err := borsh.Serialize(struct {
+		Instruction         Instruction
+		Data                *Data
+		UpdateAuthority     *common.PublicKey
+		PrimarySaleHappened *bool
+	}{
+		Instruction: InstructionUpdateMetadataAccount,
+	})
+
+	if err != nil {
+		return types.Instruction{}, errors.Wrap(err, "failed serialize")
+	}
+
+	return types.Instruction{
+		ProgramID: common.MetaplexTokenMetaProgramID,
+		Accounts: []types.AccountMeta{
+			{
+				PubKey:     metadata,
+				IsSigner:   false,
+				IsWritable: true,
+			},
+			{
+				PubKey:     owner,
+				IsSigner:   true,
+				IsWritable: false,
+			},
+		},
+		Data: data,
+	}, nil
+}
