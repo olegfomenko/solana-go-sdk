@@ -11,6 +11,20 @@ type Instruction uint8
 
 const (
 	InstructionCreateMetadataAccount Instruction = iota
+	InstructionUpdateMetadataAccount
+	InstructionDeprecatedCreateMasterEdition
+	InstructionDeprecatedMintNewEditionFromMasterEditionViaPrintingToken
+	InstructionUpdatePrimarySaleHappenedViaToken
+	InstructionDeprecatedSetReservationList
+	InstructionDeprecatedCreateReservationList
+	InstructionSignMetadata
+	InstructionDeprecatedMintPrintingTokensViaToken
+	InstructionDeprecatedMintPrintingTokens
+	InstructionCreateMasterEdition
+	InstructionMintNewEditionFromMasterEditionViaToken
+	InstructionConvertMasterEditionV1ToV2
+	InstructionMintNewEditionFromMasterEditionViaVaultProxy
+	InstructionPuffMetadata
 )
 
 func CreateMetadataAccount(metadata, mint, mintAuthority, payer, updateAuthority common.PublicKey, updateAuthorityIsSigner, isMutable bool, mintData Data) (types.Instruction, error) {
@@ -64,6 +78,75 @@ func CreateMetadataAccount(metadata, mint, mintAuthority, payer, updateAuthority
 			{
 				PubKey:     common.SysVarRentPubkey,
 				IsSigner:   false,
+				IsWritable: false,
+			},
+		},
+		Data: data,
+	}, nil
+}
+
+func UpdatePrimarySaleHappenedViaToken(metadata, owner, account common.PublicKey) (types.Instruction, error) {
+	data, err := borsh.Serialize(struct {
+		Instruction Instruction
+	}{
+		Instruction: InstructionUpdatePrimarySaleHappenedViaToken,
+	})
+
+	if err != nil {
+		return types.Instruction{}, errors.Wrap(err, "failed serialize")
+	}
+
+	return types.Instruction{
+		ProgramID: common.MetaplexTokenMetaProgramID,
+		Accounts: []types.AccountMeta{
+			{
+				PubKey:     metadata,
+				IsSigner:   false,
+				IsWritable: true,
+			},
+			{
+				PubKey:     owner,
+				IsSigner:   true,
+				IsWritable: false,
+			},
+			{
+				PubKey:     account,
+				IsSigner:   false,
+				IsWritable: false,
+			},
+		},
+		Data: data,
+	}, nil
+}
+
+func UpdateMetadataAccount(metadata, owner common.PublicKey, updateData *Data, updateAuthority *common.PublicKey, updatePrimarySaleHappened *bool) (types.Instruction, error) {
+	data, err := borsh.Serialize(struct {
+		Instruction         Instruction
+		Data                *Data
+		UpdateAuthority     *common.PublicKey
+		PrimarySaleHappened *bool
+	}{
+		Instruction:         InstructionUpdateMetadataAccount,
+		Data:                updateData,
+		UpdateAuthority:     updateAuthority,
+		PrimarySaleHappened: updatePrimarySaleHappened,
+	})
+
+	if err != nil {
+		return types.Instruction{}, errors.Wrap(err, "failed serialize")
+	}
+
+	return types.Instruction{
+		ProgramID: common.MetaplexTokenMetaProgramID,
+		Accounts: []types.AccountMeta{
+			{
+				PubKey:     metadata,
+				IsSigner:   false,
+				IsWritable: true,
+			},
+			{
+				PubKey:     owner,
+				IsSigner:   true,
 				IsWritable: false,
 			},
 		},
