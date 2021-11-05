@@ -153,3 +153,32 @@ func UpdateMetadataAccount(metadata, owner common.PublicKey, updateData *Data, u
 		Data: data,
 	}, nil
 }
+
+func SignMetadata(metadata, creator common.PublicKey) (types.Instruction, error) {
+	data, err := borsh.Serialize(struct {
+		Instruction Instruction
+	}{
+		Instruction: InstructionSignMetadata,
+	})
+
+	if err != nil {
+		return types.Instruction{}, errors.Wrap(err, "failed serialize")
+	}
+
+	return types.Instruction{
+		ProgramID: common.MetaplexTokenMetaProgramID,
+		Accounts: []types.AccountMeta{
+			{
+				PubKey:     metadata,
+				IsSigner:   false,
+				IsWritable: true,
+			},
+			{
+				PubKey:     creator,
+				IsSigner:   true,
+				IsWritable: false,
+			},
+		},
+		Data: data,
+	}, nil
+}
